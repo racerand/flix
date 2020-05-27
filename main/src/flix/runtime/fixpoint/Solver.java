@@ -18,6 +18,7 @@ package flix.runtime.fixpoint;
 
 import flix.runtime.fixpoint.predicate.AtomPredicate;
 import flix.runtime.fixpoint.predicate.Predicate;
+import flix.runtime.fixpoint.ram.interpreter.RamInterpreter;
 import flix.runtime.fixpoint.ram.stmt.Stmt;
 import flix.runtime.fixpoint.symbol.PredSym;
 
@@ -25,6 +26,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 public final class Solver {
+
+    private static int counter = 0;
 
     /**
      * Returns the composition of `cs1` with `cs2`.
@@ -65,29 +68,31 @@ public final class Solver {
      */
     public static ConstraintSystem solve(ConstraintSystem cs, Stratification stf, Options o) {
         //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
-        int timesToExperiment = 100;
+        int timesToExperiment = 1000;
         long[] times = new long[timesToExperiment];
+        ConstraintSystem result = null;
         for (int i = 0; i < timesToExperiment; i++) {
             ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
             long startTime = System.nanoTime();
             Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
-            //RamInterpreter.run(compiled);
+            result = RamInterpreter.run(compiled);
             //solver.solve();
             long endTime = System.nanoTime();
             times[i] = endTime - startTime;
         }
         long median = findMedian(times);
-        System.out.println("Median, " + median);
-        return ConstraintSystem.of(new Constraint[0]);
+        System.out.println((int) Math.pow(2, counter) + ", " + median);
+        counter++;
+        return result;
     }
 
     public static long findMedian(long[] values) {
         Arrays.sort(values);
-        System.out.println("Length = " + values.length);
+        //System.out.println("Length = " + values.length);
         int midpoint = values.length / 2 - 1;
-        System.out.println("Midpoint = " + midpoint);
+        //System.out.println("Midpoint = " + midpoint);
         if (values.length % 2 == 0) {
-            System.out.println("Midpoint2 = " + (midpoint + 1));
+            //System.out.println("Midpoint2 = " + (midpoint + 1));
             return (values[midpoint] + values[midpoint + 1]) / 2;
         }
         return values[midpoint];
