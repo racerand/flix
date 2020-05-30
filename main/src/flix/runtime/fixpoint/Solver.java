@@ -27,8 +27,6 @@ import java.util.LinkedList;
 
 public final class Solver {
 
-    private static int counter = 0;
-
     /**
      * Returns the composition of `cs1` with `cs2`.
      */
@@ -68,25 +66,32 @@ public final class Solver {
      */
     public static ConstraintSystem solve(ConstraintSystem cs, Stratification stf, Options o) {
         //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
+        int inputEdges = cs.getFacts().length;
         int timesToExperiment = 1000;
+        timesToExperiment /= inputEdges;
+        if (timesToExperiment < 1) timesToExperiment = 1;
+        else if (timesToExperiment < 10) timesToExperiment = 10;
+
         long[] times = new long[timesToExperiment];
-        ConstraintSystem result = null;
+        //System.out.println("Amount of input facts, " + cs.getFacts().length);
+        ConstraintSystem result = ConstraintSystem.of(new Constraint[0]);
         for (int i = 0; i < timesToExperiment; i++) {
-            ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
+            //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
             long startTime = System.nanoTime();
             Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
             result = RamInterpreter.run(compiled);
-            //solver.solve();
+            //result = solver.solve();
             long endTime = System.nanoTime();
             times[i] = endTime - startTime;
         }
         long median = findMedian(times);
-        System.out.println((int) Math.pow(2, counter) + ", " + median);
-        counter++;
+        //System.out.println("Amount of output facts, " + result.getFacts().length);
+        System.out.println(cs.getFacts().length + ", " + (result.getFacts().length - cs.getFacts().length) + ", " + median);
         return result;
     }
 
     public static long findMedian(long[] values) {
+        if (values.length == 1) return values[0];
         Arrays.sort(values);
         //System.out.println("Length = " + values.length);
         int midpoint = values.length / 2 - 1;
