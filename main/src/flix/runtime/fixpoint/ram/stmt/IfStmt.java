@@ -32,4 +32,9 @@ public final class IfStmt implements Stmt {
         bodyStmt.prettyPrint(stream, indentLevel + 1);
         stream.print("\n" + "\t".repeat(indentLevel) + "}");
     }
+
+    @Override
+    public int size() {
+        return 1 + bodyStmt.size();
+    }
 }

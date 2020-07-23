@@ -39,4 +39,13 @@ public final class SeqStmt implements Stmt {
             }
         }
     }
+
+    @Override
+    public int size() {
+        int result = 1;
+        for (Stmt stmt : stmts) {
+            result += stmt.size();
+        }
+        return result;
+    }
 }

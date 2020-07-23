@@ -14,4 +14,9 @@ public class LabelStmt implements Stmt {
     public void prettyPrint(PrintStream stream, int indentLevel) {
         stream.print("\t".repeat(indentLevel) + "\\\\" + label);
     }
+
+    @Override
+    public int size() {
+        return 0;
+    }
 }

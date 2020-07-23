@@ -41,4 +41,9 @@ public final class ForEachStmt implements Stmt {
         body.prettyPrint(stream, indentLevel + 1);
         stream.print('\n' + "\t".repeat(indentLevel) + '}');
     }
+
+    @Override
+    public int size() {
+        return 1 + body.size();
+    }
 }

@@ -13,4 +13,5 @@ public interface Printable {
      * @param indentLevel The amount of indentations before writing a line
      */
     void prettyPrint(PrintStream stream, int indentLevel);
+
 }

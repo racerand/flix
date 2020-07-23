@@ -39,4 +39,9 @@ public final class ProjectStmt implements Stmt {
         stream.print(") into ");
         table.prettyPrint(stream, indentLevel);
     }
+
+    @Override
+    public int size() {
+        return 1;
+    }
 }

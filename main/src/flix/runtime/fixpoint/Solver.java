@@ -18,7 +18,6 @@ package flix.runtime.fixpoint;
 
 import flix.runtime.fixpoint.predicate.AtomPredicate;
 import flix.runtime.fixpoint.predicate.Predicate;
-import flix.runtime.fixpoint.ram.interpreter.RamInterpreter;
 import flix.runtime.fixpoint.ram.stmt.Stmt;
 import flix.runtime.fixpoint.symbol.PredSym;
 
@@ -72,13 +71,17 @@ public final class Solver {
         if (timesToExperiment < 1) timesToExperiment = 1;
         else if (timesToExperiment < 10) timesToExperiment = 10;
 
+        compilerVSSolverExperiment(cs, stf, o);
+        increasingInputExperiments(cs, stf, o);
+/*        timesToExperiment = 1;
         long[] times = new long[timesToExperiment];
         //System.out.println("Amount of input facts, " + cs.getFacts().length);
         ConstraintSystem result = ConstraintSystem.of(new Constraint[0]);
+        Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
         for (int i = 0; i < timesToExperiment; i++) {
             //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
             long startTime = System.nanoTime();
-            Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
+            //Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
             result = RamInterpreter.run(compiled);
             //result = solver.solve();
             long endTime = System.nanoTime();
@@ -86,8 +89,43 @@ public final class Solver {
         }
         long median = findMedian(times);
         //System.out.println("Amount of output facts, " + result.getFacts().length);
-        System.out.println(cs.getFacts().length + ", " + (result.getFacts().length - cs.getFacts().length) + ", " + median);
-        return result;
+        System.out.println(cs.getFacts().length + ", " + (result.getFacts().length - cs.getFacts().length) + ", " + median);*/
+        return ConstraintSystem.of(new Constraint[0]);
+    }
+
+    private static void increasingInputExperiments(ConstraintSystem cs, Stratification stf, Options o) {
+
+    }
+
+    private static void compilerVSSolverExperiment(ConstraintSystem cs, Stratification stf, Options o) {
+        System.out.println("Start compiler vs solver experiment:");
+        int timesToExperiment = 10;
+
+        long[] times = new long[timesToExperiment];
+        for (int i = 0; i < timesToExperiment; i++) {
+            //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
+            long startTime = System.nanoTime();
+            //Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
+            Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
+            //result = solver.solve();
+            long endTime = System.nanoTime();
+            times[i] = endTime - startTime;
+        }
+        long median = findMedian(times);
+        System.out.println(String.format("Median of %d runs of the compiler", timesToExperiment));
+        System.out.println(median);
+
+        times = new long[timesToExperiment];
+        for (int i = 0; i < timesToExperiment; i++) {
+            ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
+            long startTime = System.nanoTime();
+            solver.solve();
+            long endTime = System.nanoTime();
+            times[i] = endTime - startTime;
+        }
+        median = findMedian(times);
+        System.out.println(String.format("Median of %d runs of the Flix solver", timesToExperiment));
+        System.out.println(median);
     }
 
     public static long findMedian(long[] values) {

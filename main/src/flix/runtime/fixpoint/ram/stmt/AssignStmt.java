@@ -31,4 +31,9 @@ public final class AssignStmt implements Stmt {
         stream.print(" := ");
         relationExp.prettyPrint(stream, indentLevel);
     }
+
+    @Override
+    public int size() {
+        return 1;
+    }
 }
