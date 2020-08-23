@@ -26,4 +26,12 @@ public class OrBoolExp implements BoolExp {
     public BoolExp getRightExp() {
         return rightExp;
     }
+
+    @Override
+    public String toString() {
+        return "OrBoolExp{" +
+                "leftExp=" + leftExp +
+                ", rightExp=" + rightExp +
+                '}';
+    }
 }

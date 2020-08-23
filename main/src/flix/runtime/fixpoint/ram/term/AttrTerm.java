@@ -27,8 +27,7 @@ public final class AttrTerm implements RamTerm {
 
     @Override
     public void prettyPrint(PrintStream stream) {
-        stream.print('$' + localVar.getVarName() +
-                "[" + index + ']');
+        stream.print(toString());
     }
 
     @Override
@@ -43,5 +42,13 @@ public final class AttrTerm implements RamTerm {
     @Override
     public int hashCode() {
         return Objects.hash(localVar, index);
+    }
+
+    @Override
+    public String toString() {
+        return "AttrTerm{" +
+                "localVar=" + localVar +
+                ", index=" + index +
+                '}';
     }
 }

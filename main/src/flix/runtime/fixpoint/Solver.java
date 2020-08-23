@@ -18,6 +18,7 @@ package flix.runtime.fixpoint;
 
 import flix.runtime.fixpoint.predicate.AtomPredicate;
 import flix.runtime.fixpoint.predicate.Predicate;
+import flix.runtime.fixpoint.ram.interpreter.RamInterpreter;
 import flix.runtime.fixpoint.ram.stmt.Stmt;
 import flix.runtime.fixpoint.symbol.PredSym;
 
@@ -64,68 +65,115 @@ public final class Solver {
      * Solves the given constraint system `cs` with the given stratification `stf` and options `o`.
      */
     public static ConstraintSystem solve(ConstraintSystem cs, Stratification stf, Options o) {
-        //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
-        int inputEdges = cs.getFacts().length;
-        int timesToExperiment = 1000;
-        timesToExperiment /= inputEdges;
-        if (timesToExperiment < 1) timesToExperiment = 1;
-        else if (timesToExperiment < 10) timesToExperiment = 10;
+        ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
 
-        compilerVSSolverExperiment(cs, stf, o);
-        increasingInputExperiments(cs, stf, o);
-/*        timesToExperiment = 1;
-        long[] times = new long[timesToExperiment];
-        //System.out.println("Amount of input facts, " + cs.getFacts().length);
-        ConstraintSystem result = ConstraintSystem.of(new Constraint[0]);
+        long compilerMedian = evalCompiler(cs, stf, o, 0);
+        long flixSolverMedian = evalFlixSolver(cs, stf, o, 0);
+        //increasingInputExperiments(cs, stf, o);
+        long interpreterMedian = evalInterpreter(cs, stf, o, 1);
+        System.out.printf("Experiment medians, %d, %d, %d%n", compilerMedian, interpreterMedian, flixSolverMedian);
+
         Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
-        for (int i = 0; i < timesToExperiment; i++) {
-            //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
-            long startTime = System.nanoTime();
-            //Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
-            result = RamInterpreter.run(compiled);
-            //result = solver.solve();
-            long endTime = System.nanoTime();
-            times[i] = endTime - startTime;
-        }
-        long median = findMedian(times);
-        //System.out.println("Amount of output facts, " + result.getFacts().length);
-        System.out.println(cs.getFacts().length + ", " + (result.getFacts().length - cs.getFacts().length) + ", " + median);*/
-        return ConstraintSystem.of(new Constraint[0]);
+        return RamInterpreter.run(compiled);
     }
 
-    private static void increasingInputExperiments(ConstraintSystem cs, Stratification stf, Options o) {
-
-    }
-
-    private static void compilerVSSolverExperiment(ConstraintSystem cs, Stratification stf, Options o) {
-        System.out.println("Start compiler vs solver experiment:");
-        int timesToExperiment = 10;
-
+    private static long evalFlixSolver(ConstraintSystem cs, Stratification stf, Options o, int timesToExperiment) {
+        if (timesToExperiment == 0) return 0;
+        System.out.println("Start solver experiment");
         long[] times = new long[timesToExperiment];
-        for (int i = 0; i < timesToExperiment; i++) {
-            //ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
-            long startTime = System.nanoTime();
-            //Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
-            Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
-            //result = solver.solve();
-            long endTime = System.nanoTime();
-            times[i] = endTime - startTime;
-        }
-        long median = findMedian(times);
-        System.out.println(String.format("Median of %d runs of the compiler", timesToExperiment));
-        System.out.println(median);
-
-        times = new long[timesToExperiment];
         for (int i = 0; i < timesToExperiment; i++) {
             ca.uwaterloo.flix.runtime.solver.Solver solver = new ca.uwaterloo.flix.runtime.solver.Solver(cs, stf, o);
             long startTime = System.nanoTime();
             solver.solve();
             long endTime = System.nanoTime();
             times[i] = endTime - startTime;
+            printPercentElapsed(i + 1, timesToExperiment);
         }
-        median = findMedian(times);
-        System.out.println(String.format("Median of %d runs of the Flix solver", timesToExperiment));
-        System.out.println(median);
+        long median = findMedian(times);
+        long mean = findMean(times);
+        System.out.printf("Median of %d runs of the Flix solver, %d%n", timesToExperiment, median);
+        System.out.printf("Mean of %d runs of the Flix solver, %d%n", timesToExperiment, mean);
+
+        return mean;
+    }
+
+    private static long evalInterpreter(ConstraintSystem cs, Stratification stf, Options o, int timesToExperiment) {
+        if (timesToExperiment == 0) return 0;
+        System.out.println("Start interpreter experiment");
+
+        long[] times = new long[timesToExperiment];
+        for (int i = 0; i < timesToExperiment; i++) {
+            long startTime = System.nanoTime();
+            Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
+            RamInterpreter.run(compiled);
+            long endTime = System.nanoTime();
+            times[i] = endTime - startTime;
+            printPercentElapsed(i + 1, timesToExperiment);
+        }
+        long median = findMedian(times);
+        long mean = findMean(times);
+        System.out.printf("Median of %d runs of the interpreter, %d%n", timesToExperiment, median);
+        System.out.printf("Mean of %d runs of the interpreter, %d%n", timesToExperiment, mean);
+
+        return median;
+    }
+
+    private static long increasingInputExperiments(ConstraintSystem cs, Stratification stf, Options o) {
+        int inputEdges = cs.getFacts().length;
+        int timesToExperiment = 1000;
+        timesToExperiment /= inputEdges;
+        if (timesToExperiment < 1) timesToExperiment = 1;
+        else if (timesToExperiment < 10) timesToExperiment = 10;
+        ConstraintSystem result = ConstraintSystem.of(new Constraint[0]);
+
+        long[] times = new long[timesToExperiment];
+        for (int i = 0; i < timesToExperiment; i++) {
+            long startTime = System.nanoTime();
+            Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
+            long endTime = System.nanoTime();
+            times[i] = endTime - startTime;
+            printPercentElapsed(i + 1, timesToExperiment);
+        }
+        long median = findMedian(times);
+        long mean = findMean(times);
+
+        System.out.println(cs.getFacts().length + ", " + (result.getFacts().length - cs.getFacts().length) + ", " + median);
+        return median;
+    }
+
+    private static long evalCompiler(ConstraintSystem cs, Stratification stf, Options o, int timesToExperiment) {
+        if (timesToExperiment == 0) return 0;
+        System.out.println("Start compiler vs solver experiment:");
+
+        long[] times = new long[timesToExperiment];
+        for (int i = 0; i < timesToExperiment; i++) {
+            long startTime = System.nanoTime();
+            Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
+            long endTime = System.nanoTime();
+            times[i] = endTime - startTime;
+            printPercentElapsed(i + 1, timesToExperiment);
+        }
+        long median = findMedian(times);
+        long mean = findMean(times);
+        System.out.printf("Median of %d runs of the compiler, %d%n", timesToExperiment, median);
+        System.out.printf("Mean of %d runs of the compiler, %d%n", timesToExperiment, mean);
+
+
+        return median;
+    }
+
+    private static void printPercentElapsed(int elapsed, int finished) {
+        float percentElapsed = (float) elapsed * 100 / finished;
+        if (1 >= finished / 100)
+            System.out.printf("Completed %f %% of the run%n", percentElapsed);
+        else if (percentElapsed % 1 < 100f / finished - 0.00001)
+            System.out.printf("Completed %f %% of the run%n", percentElapsed);
+    }
+
+    private static long findMean(long[] values) {
+        long sum = 0;
+        for (long value : values) sum += value;
+        return sum / values.length;
     }
 
     public static long findMedian(long[] values) {

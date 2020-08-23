@@ -26,4 +26,9 @@ public final class RowVariable {
     public String getVarName() {
         return varName;
     }
+
+    @Override
+    public String toString() {
+        return varName;
+    }
 }

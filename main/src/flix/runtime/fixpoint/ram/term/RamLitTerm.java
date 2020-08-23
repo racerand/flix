@@ -20,4 +20,11 @@ public final class RamLitTerm implements RamTerm {
     public void prettyPrint(PrintStream stream) {
         stream.print(literal);
     }
+
+    @Override
+    public String toString() {
+        return "RamLitTerm{" +
+                "literal=" + literal +
+                '}';
+    }
 }

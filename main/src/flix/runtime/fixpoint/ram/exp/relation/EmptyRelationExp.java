@@ -7,4 +7,9 @@ public final class EmptyRelationExp implements RelationExp {
     public void prettyPrint(PrintStream stream, int indentLevel) {
         stream.print('Ø');
     }
+
+    @Override
+    public String toString() {
+        return "EmptyRelationExp{}";
+    }
 }

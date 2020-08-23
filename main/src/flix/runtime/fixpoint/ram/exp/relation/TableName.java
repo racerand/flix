@@ -50,4 +50,12 @@ public final class TableName implements RelationExp {
     public int hashCode() {
         return Objects.hash(version, name);
     }
+
+    @Override
+    public String toString() {
+        return "TableName{" +
+                "version=" + version +
+                ", name=" + name +
+                '}';
+    }
 }

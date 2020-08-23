@@ -4,6 +4,7 @@ import flix.runtime.fixpoint.ram.exp.relation.RelationExp;
 import flix.runtime.fixpoint.ram.term.RamTerm;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 
 public final class TupleInRelBoolExp implements BoolExp {
     private final RamTerm[] terms;
@@ -36,5 +37,13 @@ public final class TupleInRelBoolExp implements BoolExp {
 
     public RelationExp getExp() {
         return exp;
+    }
+
+    @Override
+    public String toString() {
+        return "TupleInRelBoolExp{" +
+                "terms=" + Arrays.toString(terms) +
+                ", exp=" + exp +
+                '}';
     }
 }

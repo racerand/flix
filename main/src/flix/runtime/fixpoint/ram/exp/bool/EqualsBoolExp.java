@@ -29,4 +29,12 @@ public final class EqualsBoolExp implements BoolExp {
     public RamTerm getTerm2() {
         return term2;
     }
+
+    @Override
+    public String toString() {
+        return "EqualsBoolExp{" +
+                "term1=" + term1 +
+                ", term2=" + term2 +
+                '}';
+    }
 }

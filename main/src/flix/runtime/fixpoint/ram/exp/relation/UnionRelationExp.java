@@ -25,4 +25,12 @@ public class UnionRelationExp implements RelationExp {
         stream.print(" U ");
         exp2.prettyPrint(stream, indentLevel);
     }
+
+    @Override
+    public String toString() {
+        return "UnionRelationExp{" +
+                "exp1=" + exp1 +
+                ", exp2=" + exp2 +
+                '}';
+    }
 }

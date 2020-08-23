@@ -20,4 +20,11 @@ public final class NotBoolExp implements BoolExp {
     public BoolExp getExp() {
         return exp;
     }
+
+    @Override
+    public String toString() {
+        return "NotBoolExp{" +
+                "exp=" + exp +
+                '}';
+    }
 }

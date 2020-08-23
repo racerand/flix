@@ -22,4 +22,11 @@ public final class EmptyBoolExp implements BoolExp {
         relExp.prettyPrint(stream, indentLevel);
         stream.print(')');
     }
+
+    @Override
+    public String toString() {
+        return "EmptyBoolExp{" +
+                "relExp=" + relExp +
+                '}';
+    }
 }

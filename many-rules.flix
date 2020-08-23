@@ -10,8 +10,9 @@ def run(amount : Int, counter : Int) : GraphPath =
     if (counter > 12 )
         #{}
     else
-        let _t = (solve genEdges(amount) <+> genRules(1));
-        run(amount*2, counter + 1)
+        let t = (solve genEdges(amount) <+> genRules(1));
+        let _s = run(amount*2, counter + 1);
+        t
 
 
 def genEdges(amount : Int) : GraphPath =
