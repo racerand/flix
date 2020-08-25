@@ -26,6 +26,7 @@ public class RamInterpreter {
 
     private static final boolean printNewFacts = false;
     private static final PrintStream printStream = System.out;
+    private static boolean work_loud = false;
 
     public static ConstraintSystem run(Stmt toInterpret) {
         Map<TableName, Set<Fact>> interpretation = new HashMap<>();
@@ -45,7 +46,7 @@ public class RamInterpreter {
             } else {
                 for (Fact fact : tableFacts) {
                     Term[] terms = factToTermArray(fact);
-                    AtomPredicate headPredicate = AtomPredicate.of(table.getName(),true, terms);
+                    AtomPredicate headPredicate = AtomPredicate.of(table.getName(), true, terms);
                     resultConstraints.add(Constraint.of(new VarSym[0], headPredicate, new Predicate[0], null));
                 }
             }
@@ -108,7 +109,10 @@ public class RamInterpreter {
             while (evalBoolExp(currStmt.getCondition(), interpretation, environment)) {
                 evalStmt(currStmt.getBody(), interpretation, environment);
             }
-        } else if (!(toEval instanceof LabelStmt)) {
+        } else if (toEval instanceof LabelStmt && work_loud) {
+            toEval.prettyPrint(printStream, 0);
+            printStream.println();
+        } else {
             throw new IllegalArgumentException(toEval.getClass().getName() + " is not a supported argument for the interpreter.");
         }
     }

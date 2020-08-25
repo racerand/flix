@@ -69,12 +69,11 @@ public final class Solver {
 
         long compilerMedian = evalCompiler(cs, stf, o, 0);
         long flixSolverMedian = evalFlixSolver(cs, stf, o, 0);
-        //increasingInputExperiments(cs, stf, o);
-        long interpreterMedian = evalInterpreter(cs, stf, o, 1);
-        System.out.printf("Experiment medians, %d, %d, %d%n", compilerMedian, interpreterMedian, flixSolverMedian);
+        long interpreterMedian = evalInterpreter(cs, stf, o, 0);
+        //System.out.printf("Experiment medians, %d, %d, %d%n", compilerMedian, interpreterMedian, flixSolverMedian);
 
-        Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
-        return RamInterpreter.run(compiled);
+        increasingInputExperiments(cs, stf, o);
+        return ConstraintSystem.of(new Constraint[0]);
     }
 
     private static long evalFlixSolver(ConstraintSystem cs, Stratification stf, Options o, int timesToExperiment) {
@@ -118,27 +117,14 @@ public final class Solver {
         return median;
     }
 
-    private static long increasingInputExperiments(ConstraintSystem cs, Stratification stf, Options o) {
+    private static void increasingInputExperiments(ConstraintSystem cs, Stratification stf, Options o) {
         int inputEdges = cs.getFacts().length;
-        int timesToExperiment = 1000;
-        timesToExperiment /= inputEdges;
-        if (timesToExperiment < 1) timesToExperiment = 1;
-        else if (timesToExperiment < 10) timesToExperiment = 10;
-        ConstraintSystem result = ConstraintSystem.of(new Constraint[0]);
+        int inputRules = cs.getRules().length;
 
-        long[] times = new long[timesToExperiment];
-        for (int i = 0; i < timesToExperiment; i++) {
-            long startTime = System.nanoTime();
-            Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
-            long endTime = System.nanoTime();
-            times[i] = endTime - startTime;
-            printPercentElapsed(i + 1, timesToExperiment);
-        }
-        long median = findMedian(times);
-        long mean = findMean(times);
+        Stmt compiled = DatalogCompiler.compileProgram(cs, stf, o);
+        int programSize = compiled.size();
 
-        System.out.println(cs.getFacts().length + ", " + (result.getFacts().length - cs.getFacts().length) + ", " + median);
-        return median;
+        System.out.printf("%d, %d, %d%n", inputEdges, inputRules, programSize);
     }
 
     private static long evalCompiler(ConstraintSystem cs, Stratification stf, Options o, int timesToExperiment) {

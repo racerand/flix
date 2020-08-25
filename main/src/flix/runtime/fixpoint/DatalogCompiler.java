@@ -391,7 +391,6 @@ public class DatalogCompiler {
             Term term = inputTerms[i];
             if (term instanceof VarTerm) {
                 VarSym sym = ((VarTerm) term).getSym();
-                Set<AttrTerm> a = varSymToAttrTerm.get(sym);
                 result[i] = varSymToAttrTerm.get(sym).iterator().next();
             } else if (term instanceof LitTerm) {
                 result[i] = new RamLitTerm(((LitTerm) term).getFunction().apply(nullArray));
