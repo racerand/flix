@@ -27,7 +27,8 @@ public final class AttrTerm implements RamTerm {
 
     @Override
     public void prettyPrint(PrintStream stream) {
-        stream.print(toString());
+        stream.print('$' + localVar.getVarName() +
+                "[" + index + ']');
     }
 
     @Override

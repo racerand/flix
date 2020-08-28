@@ -10,9 +10,8 @@ def run(amount : Int, counter : Int) : GraphPath =
     if (counter > 12 )
         #{}
     else
-        let t = (solve genEdges(0) <+> genRules(amount));
-        let _s = run(amount*2, counter + 1);
-        t
+        let _t = (solve genEdges(amount) <+> genRules(0));
+        run(amount*2, counter + 1)
 
 
 def genEdges(amount : Int) : GraphPath =
@@ -20,13 +19,11 @@ def genEdges(amount : Int) : GraphPath =
             let d = s + 1;
             acc <+> Edge(s, d).
         };
-        let facts = List.range(1, amount + 1) |> List.foldLeft(fold, #{});
-        facts
+    List.range(1, amount + 1) |> List.foldLeft(fold, #{})
 
 def genRules(amount : Int) : GraphPath =
     let fold = (acc : GraphPath, _s:Int) -> {
         acc <+> #{Path(a, k) :- Path(a, k)/*, Edge(b, c), Edge(c, d),
             Edge(d, e), Edge(e, f), Edge(f, g), Edge(g, h), Edge(h, i), Edge(i, j), Edge(j, k)*/.}
     };
-    let rules = List.range(1, amount + 1) |> List.foldLeft(fold, #{});
-    rules// <+> #{Path(a, b) :- Edge(a, b).}
+    List.range(1, amount + 1) |> List.foldLeft(fold, #{})// <+> #{Path(a, b) :- Edge(a, b).}

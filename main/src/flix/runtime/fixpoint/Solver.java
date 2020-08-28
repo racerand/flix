@@ -72,7 +72,7 @@ public final class Solver {
         long interpreterMedian = evalInterpreter(cs, stf, o, 0);
         //System.out.printf("Experiment medians, %d, %d, %d%n", compilerMedian, interpreterMedian, flixSolverMedian);
 
-        increasingInputExperiments(cs, stf, o);
+        evalSizeOfCompiled(cs, stf, o);
         return ConstraintSystem.of(new Constraint[0]);
     }
 
@@ -117,7 +117,7 @@ public final class Solver {
         return median;
     }
 
-    private static void increasingInputExperiments(ConstraintSystem cs, Stratification stf, Options o) {
+    private static void evalSizeOfCompiled(ConstraintSystem cs, Stratification stf, Options o) {
         int inputEdges = cs.getFacts().length;
         int inputRules = cs.getRules().length;
 
