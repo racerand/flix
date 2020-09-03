@@ -70,7 +70,8 @@ public final class Solver {
         long compilerMedian = evalCompiler(cs, stf, o, 0);
         long flixSolverMedian = evalFlixSolver(cs, stf, o, 0);
         long interpreterMedian = evalInterpreter(cs, stf, o, 0);
-        //System.out.printf("Experiment medians, %d, %d, %d%n", compilerMedian, interpreterMedian, flixSolverMedian);
+        if (compilerMedian != 0 || flixSolverMedian != 0 || interpreterMedian != 0)
+            System.out.printf("Experiment medians, %d, %d, %d%n", compilerMedian, interpreterMedian, flixSolverMedian);
 
         evalSizeOfCompiled(cs, stf, o);
         return ConstraintSystem.of(new Constraint[0]);
