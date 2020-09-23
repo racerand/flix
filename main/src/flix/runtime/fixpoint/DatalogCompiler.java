@@ -386,7 +386,8 @@ public class DatalogCompiler {
 
     /**
      * Translates terms to their RamTerm equivalents
-     * @param inputTerms The Terms to translate
+     *
+     * @param inputTerms       The Terms to translate
      * @param varSymToAttrTerm A mapping from VarSym to AttrTerm that is used to find intantiations of variables
      * @return The RamTerm array holding the translation
      */
@@ -437,7 +438,6 @@ public class DatalogCompiler {
         }
         return resultStmt;
     }
-
 
     /**
      * Generates a new RowVariable using the variableCounter
