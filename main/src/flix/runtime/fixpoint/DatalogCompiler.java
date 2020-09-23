@@ -37,6 +37,11 @@ public class DatalogCompiler {
 
         // Then find all the rules and map them to what they derive, and in which stratum they should be evaluated
         Map<Integer, Map<RelSym, ArrayList<Constraint>>> derivedInStratum = findRulesForDerivedInStratums(cs, stf);
+        int sum = 0;
+        for (int i : derivedInStratum.keySet()) {
+            sum += derivedInStratum.get(i).keySet().size();
+        }
+        System.out.printf("Derived predicate symbols: %d%n", sum);
 
         // And then all stratum are evaluated
         resultStmts.addAll(compileStratums(derivedInStratum));

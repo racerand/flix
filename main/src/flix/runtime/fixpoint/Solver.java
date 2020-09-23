@@ -73,6 +73,18 @@ public final class Solver {
         if (compilerMedian != 0 || flixSolverMedian != 0 || interpreterMedian != 0)
             System.out.printf("Experiment medians, %d, %d, %d%n", compilerMedian, interpreterMedian, flixSolverMedian);
 
+        int minAtoms = 100;
+        int maxAtoms = 0;
+        for (Constraint c : cs.getRules()) {
+            int bodyAtoms = c.getBodyAtoms().length;
+            if (bodyAtoms < minAtoms) {
+                minAtoms = bodyAtoms;
+            }
+            if (maxAtoms < bodyAtoms) {
+                maxAtoms = bodyAtoms;
+            }
+        }
+        System.out.printf("%d, %d%n", minAtoms, maxAtoms);
         evalSizeOfCompiled(cs, stf, o);
         return ConstraintSystem.of(new Constraint[0]);
     }
