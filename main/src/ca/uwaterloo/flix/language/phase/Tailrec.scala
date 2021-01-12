@@ -66,6 +66,9 @@ object Tailrec extends Phase[Root, Root] {
     newRoot.toSuccess
   }
 
+  def setEndTail(newTailExp: Expression): Expression = ???
+
+
   def makeTRMCHelper(defn: Def, originalDefnSym: DefnSym)(implicit flix: Flix): Def = {
     val refreshedDef = LiftedAstOps.refreshVarNames(defn)
 
